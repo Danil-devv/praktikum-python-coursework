@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Опрос не найден</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f6fa;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #e74c3c;
+        }
+
+        p {
+            font-size: 18px;
+            color: #2f3640;
+        }
+
+        a {
+            font-size: 18px;
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<h1>Данный опрос не найден</h1>
+<p>Возможно, он был удалён или вы ввели некорректную ссылку.</p>
+<a href="{% url 'home' %}">Вернуться на главную</a>
+</body>
+</html>

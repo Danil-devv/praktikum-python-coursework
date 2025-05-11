@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Результаты: {{ poll.title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f6fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2f3640;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #dcdde1;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav a, nav span {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #2f3640;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 30px;
+        }
+
+        h3 {
+            margin-top: 30px;
+            color: #353b48;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        li {
+            background-color: #f1f2f6;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-left: 5px solid #40739e;
+            border-radius: 4px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: #40739e;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            background-color: #273c75;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Результаты опроса: {{ poll.title }}</h1>
+</header>
+
+<nav>
+    <div>
+        <a href="{% url 'home' %}">🏠 Главная</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'my_polls' %}">📋 Мои опросы</a>
+        <a href="{% url 'create_poll' %}">➕ Создать опрос</a>
+        {% endif %}
+    </div>
+    <div>
+        {% if user.is_authenticated %}
+        <span>👋 Привет, {{ user.username }}</span>
+        <a href="{% url 'logout' %}">🚪 Выйти</a>
+        {% else %}
+        <a href="{% url 'login' %}">🔐 Вход</a>
+        <a href="{% url 'register' %}">📝 Регистрация</a>
+        {% endif %}
+    </div>
+</nav>
+
+<div class="container">
+    {% for result in results %}
+    <h3>{{ result.question.text }}</h3>
+    <ul>
+        {% for choice in result.choices %}
+        <li>
+            {{ choice.text }} — {{ choice.count }} голос(ов)
+            ({{ choice.percent }}%)
+        </li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+
+    <a href="{% url 'my_polls' %}" class="back-link">← Назад к моим опросам</a>
+</div>
+
+</body>
+</html>

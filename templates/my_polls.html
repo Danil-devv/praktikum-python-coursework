@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои опросы</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f6fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2f3640;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #dcdde1;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav a {
+            color: #2f3640;
+            text-decoration: none;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #2f3640;
+            margin-bottom: 20px;
+        }
+
+        .poll-card {
+            border: 1px solid #dcdde1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+        }
+
+        .poll-card strong {
+            font-size: 18px;
+        }
+
+        .poll-actions {
+            margin-top: 10px;
+        }
+
+        .poll-actions button,
+        .poll-actions a {
+            background: #40739e;
+            color: white;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            margin-right: 5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .poll-actions button:hover,
+        .poll-actions a:hover {
+            background: #273c75;
+        }
+
+        .danger {
+            background-color: #e84118;
+        }
+
+        .danger:hover {
+            background-color: #c23616;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Мои опросы</h1>
+</header>
+
+<nav>
+    <div>
+        <a href="{% url 'home' %}">🏠 Главная</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'my_polls' %}">📋 Мои опросы</a>
+        <a href="{% url 'create_poll' %}">➕ Создать опрос</a>
+        {% endif %}
+    </div>
+    <div>
+        {% if user.is_authenticated %}
+        <span>👋 Привет, {{ user.username }}</span>
+        <a href="{% url 'logout' %}">🚪 Выйти</a>
+        {% else %}
+        <a href="{% url 'login' %}">🔐 Вход</a>
+        <a href="{% url 'register' %}">📝 Регистрация</a>
+        {% endif %}
+    </div>
+</nav>
+
+<div class="container">
+    {% if polls %}
+    {% for poll in polls %}
+    <div class="poll-card">
+        <strong>{{ poll.title }}</strong>
+        <div class="poll-actions">
+            🔗
+            <button onclick="copyToClipboard('{{ request.scheme }}://{{ request.get_host }}{% url 'poll_detail' poll.id %}')">
+                Поделиться
+            </button>
+            📊
+            <a href="{% url 'poll_results' poll.id %}">Результаты</a>
+            ❌
+            <a href="{% url 'delete_poll' poll.id %}" class="danger">Удалить</a>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>У вас пока нет созданных опросов.</p>
+    {% endif %}
+</div>
+
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function () {
+            alert("Ссылка скопирована!");
+        }, function (err) {
+            alert("Ошибка при копировании: " + err);
+        });
+    }
+</script>
+
+</body>
+</html>

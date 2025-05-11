@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ poll.title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f6fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2f3640;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #dcdde1;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav a, nav span {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #2f3640;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        fieldset {
+            border: 2px solid #ced6e0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        legend {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #2f3640;
+        }
+
+        label {
+            display: block;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+
+        button {
+            background-color: #44bd32;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2ecc71;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>{{ poll.title }}</h1>
+</header>
+
+<nav>
+    <div>
+        <a href="{% url 'home' %}">🏠 Главная</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'my_polls' %}">📋 Мои опросы</a>
+        <a href="{% url 'create_poll' %}">➕ Создать опрос</a>
+        {% endif %}
+    </div>
+    <div>
+        {% if user.is_authenticated %}
+        <span>👋 Привет, {{ user.username }}</span>
+        <a href="{% url 'logout' %}">🚪 Выйти</a>
+        {% else %}
+        <a href="{% url 'login' %}">🔐 Вход</a>
+        <a href="{% url 'register' %}">📝 Регистрация</a>
+        {% endif %}
+    </div>
+</nav>
+
+<div class="container">
+    <form method="post">
+        {% csrf_token %}
+        {% for question in questions %}
+        <fieldset>
+            <legend>{{ question.text }}</legend>
+
+            {% if question.question_type == 'S' %}
+            {% for choice in question.choices.all %}
+            <label>
+                <input type="radio" name="question_{{ question.id }}" value="{{ choice.id }}" required>
+                {{ choice.text }}
+            </label>
+            {% endfor %}
+            {% else %}
+            {% for choice in question.choices.all %}
+            <label>
+                <input type="checkbox" name="question_{{ question.id }}" value="{{ choice.id }}">
+                {{ choice.text }}
+            </label>
+            {% endfor %}
+            {% endif %}
+        </fieldset>
+        {% endfor %}
+        <button type="submit">Проголосовать</button>
+    </form>
+</div>
+
+</body>
+</html>

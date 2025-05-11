@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Создать опрос</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f6fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            background-color: #dcdde1;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav a, nav span {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #2f3640;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px 12px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            background-color: #6cafe8;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #3498db;
+        }
+
+        hr {
+            margin: 30px 0;
+            border: none;
+            border-top: 1px solid #ccc;
+        }
+
+        .question-block {
+            background-color: #f0f0f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .delete-button {
+            background-color: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background-color: #c0392b;
+        }
+
+        header {
+            background-color: #2f3640;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Создание опроса</h1>
+</header>
+
+<nav>
+    <div>
+        <a href="{% url 'home' %}">🏠 Главная</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'my_polls' %}">📋 Мои опросы</a>
+        <a href="{% url 'create_poll' %}">➕ Создать опрос</a>
+        {% endif %}
+    </div>
+    <div>
+        {% if user.is_authenticated %}
+        <span>👋 Привет, {{ user.username }}</span>
+        <a href="{% url 'logout' %}">🚪 Выйти</a>
+        {% else %}
+        <a href="{% url 'login' %}">🔐 Вход</a>
+        <a href="{% url 'register' %}">📝 Регистрация</a>
+        {% endif %}
+    </div>
+</nav>
+<div class="container">
+    <form method="post" id="create_poll_form">
+        {% csrf_token %}
+        <label>Название опроса:</label>
+        <input type="text" name="poll_title" required>
+
+        <button type="button" onclick="addQuestion()">➕ Добавить вопрос</button>
+        <div id="questions_container"></div>
+
+        <br>
+        <button type="submit">💾 Сохранить опрос</button>
+    </form>
+</div>
+
+<script>
+    let questionCount = 0;
+
+    function addQuestion() {
+        const container = document.getElementById('questions_container');
+        const qIndex = questionCount++;
+
+        const qDiv = document.createElement('div');
+        qDiv.className = 'question-block';
+        qDiv.id = `question_${qIndex}`;
+        qDiv.innerHTML = `
+        <h3>Вопрос ${qIndex + 1}</h3>
+        <label>Текст вопроса:</label>
+        <input type="text" name="question_${qIndex}_text" required>
+
+        <label>Тип вопроса:</label>
+        <select name="question_${qIndex}_type">
+            <option value="S">Единичный выбор</option>
+            <option value="M">Множественный выбор</option>
+        </select>
+
+        <div id="question_${qIndex}_choices"></div>
+        <button type="button" onclick="addChoice(${qIndex})">➕ Добавить вариант ответа</button>
+
+        <button type="button" class="delete-button" onclick="deleteQuestion(${qIndex})">❌ Удалить вопрос</button>
+    `;
+        container.appendChild(qDiv);
+    }
+
+    function addChoice(qIndex) {
+        const container = document.getElementById(`question_${qIndex}_choices`);
+        const count = container.querySelectorAll('input').length;
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = `question_${qIndex}_choice_${count}`;
+        input.placeholder = `Вариант ${count + 1}`;
+        input.required = true;
+        input.style.marginTop = '5px';
+        input.classList.add('choice-input');
+        container.appendChild(input);
+        container.appendChild(document.createElement('br'));
+    }
+
+    function deleteQuestion(qIndex) {
+        const questionDiv = document.getElementById(`question_${qIndex}`);
+        questionDiv.remove();
+    }
+
+    document.getElementById('create_poll_form').addEventListener('submit', function (event) {
+        const questions = document.querySelectorAll('[id^="question_"]');
+        let valid = true;
+
+        if (questions.length === 0) {
+            alert("Опрос должен содержать хотя бы один вопрос.");
+            valid = false;
+        }
+
+        let hasInvalidQuestion = false;
+        questions.forEach(function (questionDiv) {
+            let choices = questionDiv.querySelectorAll('.choice-input');
+            if (choices.length < 2) {
+                hasInvalidQuestion = true;
+            }
+        });
+
+        if (hasInvalidQuestion) {
+            alert("Каждый вопрос должен иметь хотя бы два варианта ответа.");
+            valid = false;
+        }
+
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
+</script>
+
+</body>
+</html>
