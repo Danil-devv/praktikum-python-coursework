@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  web:
+    build: .
+    command: gunicorn polls_project.wsgi:application --bind 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DEBUG=0
+      - DJANGO_SECRET_KEY=ji=aa0n@lpmq3mswv*ujv#uu5nlrd(gj2ppzg9vl0@-a@mhvg^
+      - DATABASE_NAME=polls_db
+      - DATABASE_USER=polls_user
+      - DATABASE_PASSWORD=secure_password
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: polls_db
+      POSTGRES_USER: polls_user
+      POSTGRES_PASSWORD: secure_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

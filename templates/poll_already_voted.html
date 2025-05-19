@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Голосование завершено</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f6fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            background-color: #dcdde1;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav a, nav span {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #2f3640;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 40px;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .warning {
+            font-size: 1.5em;
+            color: #e84118;
+            margin-bottom: 20px;
+        }
+
+        .actions a {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #40739e;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+        .actions a:hover {
+            background-color: #3498db;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div>
+        <a href="{% url 'home' %}">🏠 Главная</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'my_polls' %}">📋 Мои опросы</a>
+        <a href="{% url 'create_poll' %}">➕ Создать опрос</a>
+        {% endif %}
+    </div>
+    <div>
+        {% if user.is_authenticated %}
+        <span>👋 Привет, {{ user.username }}</span>
+        <a href="{% url 'logout' %}">🚪 Выйти</a>
+        {% else %}
+        <a href="{% url 'login' %}">🔐 Вход</a>
+        <a href="{% url 'register' %}">📝 Регистрация</a>
+        {% endif %}
+    </div>
+</nav>
+
+<div class="container">
+    <div class="warning">⚠️ Вы уже голосовали в этом опросе.</div>
+    <div class="actions">
+        <a href="{% url 'home' %}">Вернуться на главную</a>
+    </div>
+</div>
+
+</body>
+</html>

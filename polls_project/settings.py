@@ -1,8 +1,9 @@
 from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-test-key'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'fallback-insecure-key')
 
 DEBUG = True
 
@@ -50,8 +51,12 @@ WSGI_APPLICATION = 'polls_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DATABASE_NAME', 'polls_db'),
+        'USER': os.getenv('DATABASE_USER', 'polls_user'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD', 'secure_password'),
+        'HOST': os.getenv('DATABASE_HOST', 'localhost'),
+        'PORT': os.getenv('DATABASE_PORT', '5432'),
     }
 }
 
@@ -66,3 +71,4 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

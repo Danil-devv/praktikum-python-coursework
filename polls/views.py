@@ -76,6 +76,11 @@ def poll_detail(request, poll_id):
     except Poll.DoesNotExist:
         return render(request, 'poll_not_found.html')
 
+
+    has_voted = Vote.objects.filter(user=request.user, question__poll=poll).exists()
+    if has_voted and request.method == 'GET':
+        return render(request, 'poll_already_voted.html', {'poll': poll})
+
     questions = poll.questions.all()
 
     if request.method == 'POST':
